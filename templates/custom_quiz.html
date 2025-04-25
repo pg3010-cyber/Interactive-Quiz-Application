@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Generator - Create Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+    <nav class="bg-blue-600 p-4 text-white">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold mb-2 sm:mb-0">AI Quiz Generator</a>
+            <div class="flex flex-col sm:flex-row sm:space-x-4">
+                {% if session.user_id %}
+                    <a href="{{ url_for('dashboard') }}" class="mb-2 sm:mb-0 hover:underline">Dashboard</a>
+                    <a href="{{ url_for('history') }}" class="mb-2 sm:mb-0 hover:underline">History</a>
+                    <a href="{{ url_for('custom_quiz') }}" class="mb-2 sm:mb-0 hover:underline">Create Quiz</a>
+                    <a href="{{ url_for('upload') }}" class="mb-2 sm:mb-0 hover:underline">Upload</a>
+                    <a href="{{ url_for('summary_quiz') }}" class="mb-2 sm:mb-0 hover:underline">Summary Quiz</a>
+                    <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="mb-2 sm:mb-0 hover:underline">Login</a>
+                    <a href="{{ url_for('register') }}" class="hover:underline">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto p-4 sm:p-6 flex-grow">
+        <div>
+            <h1 class="text-xl sm:text-3xl font-bold mb-4">Create Custom Quiz</h1>
+            <form action="{{ url_for('custom_quiz') }}" method="post" class="max-w-md mx-auto bg-white p-4 sm:p-6 rounded shadow-md">
+                <div class="mb-4">
+                    <label for="title" class="block text-gray-700 text-sm sm:text-base">Quiz Title</label>
+                    <input type="text" id="title" name="title" class="w-full p-2 border rounded text-sm sm:text-base" required>
+                </div>
+                <div class="mb-4">
+                    <label for="num_questions" class="block text-gray-700 text-sm sm:text-base">Number of Questions</label>
+                    <input type="number" id="num_questions" name="num_questions" min="1" max="20" class="w-full p-2 border rounded text-sm sm:text-base" required>
+                </div>
+                <div id="questions" class="space-y-4"></div>
+                <button type="button" onclick="addQuestion()" class="bg-blue-600 text-white p-2 rounded mb-4 w-full sm:w-auto text-sm sm:text-base hover:bg-blue-700">Add Question</button>
+                <button type="submit" class="bg-blue-600 text-white p-2 rounded w-full text-sm sm:text-base hover:bg-blue-700">Create Quiz</button>
+            </form>
+        </div>
+    </main>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        <p class="text-sm sm:text-base">© 2025 AI Quiz Generator</p>
+    </footer>
+    <script>
+        let qCount = 0;
+        function addQuestion() {
+            qCount++;
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm sm:text-base">Question ${qCount}</label>
+                    <input type="text" name="q${qCount}_text" class="w-full p-2 border rounded text-sm sm:text-base" required>
+                    <select name="q${qCount}_type" class="w-full p-2 border rounded mt-2 text-sm sm:text-base" onchange="updateOptions(this, ${qCount})">
+                        <option value="MCQ">MCQ</option>
+                        <option value="True/False">True/False</option>
+                        <option value="Fill-in-the-blank">Fill-in-the-blank</option>
+                    </select>
+                    <div id="options${qCount}" class="mt-2 space-y-2">
+                        <input type="text" name="q${qCount}_opt1" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 1">
+                        <input type="text" name="q${qCount}_opt2" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 2">
+                        <input type="text" name="q${qCount}_opt3" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 3">
+                        <input type="text" name="q${qCount}_opt4" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 4">
+                    </div>
+                    <input type="text" name="q${qCount}_correct" class="w-full p-2 border rounded mt-2 text-sm sm:text-base" placeholder="Correct Answer" required>
+                    <textarea name="q${qCount}_explanation" class="w-full p-2 border rounded mt-2 text-sm sm:text-base" placeholder="Explanation" required></textarea>
+                </div>
+            `;
+            document.getElementById('questions').appendChild(div);
+        }
+        function updateOptions(select, qNum) {
+            const optionsDiv = document.getElementById(`options${qNum}`);
+            if (select.value !== 'MCQ') {
+                optionsDiv.innerHTML = '';
+            } else {
+                optionsDiv.innerHTML = `
+                    <input type="text" name="q${qNum}_opt1" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 1">
+                    <input type="text" name="q${qNum}_opt2" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 2">
+                    <input type="text" name="q${qNum}_opt3" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 3">
+                    <input type="text" name="q${qNum}_opt4" class="w-full p-2 border rounded text-sm sm:text-base" placeholder="Option 4">
+                `;
+            }
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

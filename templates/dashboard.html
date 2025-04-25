@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Generator - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+    <nav class="bg-blue-600 p-4 text-white">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold mb-2 sm:mb-0">AI Quiz Generator</a>
+            <div class="flex flex-col sm:flex-row sm:space-x-4">
+                {% if session.user_id %}
+                    <a href="{{ url_for('dashboard') }}" class="mb-2 sm:mb-0 hover:underline">Dashboard</a>
+                    <a href="{{ url_for('history') }}" class="mb-2 sm:mb-0 hover:underline">History</a>
+                    <a href="{{ url_for('custom_quiz') }}" class="mb-2 sm:mb-0 hover:underline">Create Quiz</a>
+                    <a href="{{ url_for('upload') }}" class="mb-2 sm:mb-0 hover:underline">Upload</a>
+                    <a href="{{ url_for('summary_quiz') }}" class="mb-2 sm:mb-0 hover:underline">Summary Quiz</a>
+                    <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="mb-2 sm:mb-0 hover:underline">Login</a>
+                    <a href="{{ url_for('register') }}" class="hover:underline">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto p-4 sm:p-6 flex-grow">
+        <div>
+            <h1 class="text-xl sm:text-3xl font-bold mb-4">Welcome, {{ user.name }}</h1>
+            <h2 class="text-lg sm:text-2xl mb-4">Your Progress</h2>
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-xl">Recent Quizzes</h3>
+                {% for quiz in quizzes %}
+                <p class="text- sm:text-base">Topic: {{ quiz.topic }} - Score: {{ quiz.score }}/{{ quiz.total_questions }} - Date: {{ quiz.date }}</p>
+                {% endfor %}
+            </div>
+            <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-xl">Leaderboard</h3>
+                {% for entry in leaderboard %}
+                <p class="text-sm sm:text-base">{{ entry.user.name }} - Total Score: {{ entry.total_score }} - Streaks: {{ entry.streaks }}</p>
+                {% endfor %}
+            </div>
+            <div>
+                <h3 class="text-base sm:text-xl">Analytics</h3>
+                <p class="text-sm sm:text-base">Average Score: {{ (quizzes|sum(attribute='score') / (quizzes|sum(attribute='total_questions')) * 100)|round(2) if quizzes else 0 }}%</p>
+                <p class="text-sm sm:text-base">Strongest Topic: TBD</p>
+                <p class="text-sm sm:text-base">Weakest Topic: TBD</p>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-blue-600 text-white p-4 text-center">
+        <p class="text-sm sm:text-base">© 2025 AI Quiz Generator</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
